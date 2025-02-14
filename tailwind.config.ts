@@ -22,7 +22,7 @@ export default {
         //цвета шрифтов для фонов
         txPage: '#4b6166',
         txComp: '#2e4057',
-        txElem: '#e5989b',
+        txElem: '#f4a261',
         txElemActive: '#ffcb77',
         txHeaderFooter: '#edf2f4',
       },
