@@ -9,7 +9,7 @@ export default function Home() {
     name: "Nov",
     time: 7,
     temp: -7,
-    image: "https://openweathermap.org/img/wn/10d@2x.png", // Замените на URL вашей иконки
+    image: "https://openweathermap.org/img/wn/10d@2x.png",
   };
 
   return (

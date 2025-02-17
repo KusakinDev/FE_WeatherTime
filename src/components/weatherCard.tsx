@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { weatherType } from "@/types/weatherType";
+import axios from "axios";
+import API_URL from "@/config";
 import { FaSearch, FaTrash, FaSign, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 
 const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
@@ -12,8 +14,15 @@ const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
     setCity(e.target.value);
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log("Ищем погоду для города:", city);
+
+    const response = await axios.get(`${API_URL}/${name}`);
+    if (response.status !== 200) {
+      console.error(response.status);
+    } else {
+      console.log(response.data);
+    }
   };
 
   const handleClear = () => {
@@ -34,11 +43,10 @@ const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
       adjustedTime.setUTCMinutes(utcMinutes);
       adjustedTime.setUTCSeconds(utcSeconds);
 
-      // Форматируем время для отображения
       setCurrentTime(adjustedTime.toLocaleTimeString("en-GB", { timeZone: "UTC" }));
     };
 
-    updateTime(); // Обновляем сразу
+    updateTime(); 
     const intervalId = setInterval(updateTime, 1000);
 
     return () => clearInterval(intervalId);
