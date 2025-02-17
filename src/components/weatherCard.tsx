@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { weatherType } from "@/types/weatherType";
 import { FaSearch, FaTrash, FaSign, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 
-const WeatherCard: React.FC<weatherType> = ({ time, temp, image }) => {
+const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
   const [city, setCity] = useState("");
   const [currentTime, setCurrentTime] = useState("");
 
@@ -58,7 +58,7 @@ const WeatherCard: React.FC<weatherType> = ({ time, temp, image }) => {
             id="city"
             value={city}
             onChange={handleInputChange}
-            placeholder="Введите название города..."
+            placeholder={`Введите название города... ${name}`}
             className="bg-bgElem w-full h-10 rounded-md shadow-sm  sm:text-m text-txElemActive pl-3 focus:outline-none focus:border-bgElemActive focus:ring-2 focus:ring-bgElemActive"
           />
           <div className="absolute inset-y-0 right-0 flex items-center space-x-2 pr-2">
