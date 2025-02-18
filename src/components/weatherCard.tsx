@@ -2,13 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 import { weatherType } from "@/types/weatherType";
+import { ErrorType } from "@/types/errorType";
 import axios from "axios";
 import API_URL from "@/config";
-import { FaSearch, FaTrash, FaSign, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import { FaSearch, FaTrash } from "react-icons/fa";
 
-const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
-  const [city, setCity] = useState("");
+type WeatherProps = {
+  initData: weatherType;
+};
+
+
+
+const WeatherCard: React.FC<WeatherProps> = ({ initData }) => {
+  // Определяем начальное значение city
+  const initialCity = initData.name !== " " ? initData.name : "";
+
+  const [city, setCity] = useState(initialCity);
   const [currentTime, setCurrentTime] = useState("");
+  const [errorMessage, setErrorMessage] = useState<ErrorType>({"message": "no error"})
+
+  const [weatherType, setWeather] = useState<weatherType>(initData);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCity(e.target.value);
@@ -17,11 +30,17 @@ const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
   const handleSearch = async () => {
     console.log("Ищем погоду для города:", city);
 
-    const response = await axios.get(`${API_URL}/${name}`);
-    if (response.status !== 200) {
-      console.error(response.status);
-    } else {
-      console.log(response.data);
+    try {
+      const response = await axios.get(`${API_URL}/weather?name=${city}`);
+      if (response.status === 200) {
+        setWeather(response.data);
+        console.log(weatherType);
+      } if (response.status === 400) {
+        setErrorMessage(response.data)
+        console.log('Data load error:', errorMessage);
+      }
+    } catch (error) {
+      console.error('Request error:', error);
     }
   };
 
@@ -31,28 +50,23 @@ const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
 
   useEffect(() => {
     const updateTime = () => {
-
       const now = new Date();
-      const utcHours = now.getUTCHours();
-      const utcMinutes = now.getUTCMinutes();
-      const utcSeconds = now.getUTCSeconds();
-
-
-      const adjustedTime = new Date();
-      adjustedTime.setUTCHours(utcHours + time);
-      adjustedTime.setUTCMinutes(utcMinutes);
-      adjustedTime.setUTCSeconds(utcSeconds);
-
-      setCurrentTime(adjustedTime.toLocaleTimeString("en-GB", { timeZone: "UTC" }));
+      const adjustedTime = new Date(now.getTime() + weatherType.timezone * 1000);
+      setCurrentTime(adjustedTime.toLocaleTimeString("en-GB"));
     };
 
-    updateTime(); 
+    updateTime();
     const intervalId = setInterval(updateTime, 1000);
 
     return () => clearInterval(intervalId);
-  }, [time]);
+  }, [weatherType.timezone]);
 
-  
+  useEffect(() => {
+    // Если начальное имя города не пустое, выполняем handleSearch
+    if (initData.name !== " ") {
+      handleSearch();
+    }
+  }, [initData.name]); // Запуск эффекта при монтировании и при изменении initData.name
 
   return (
     <div className="w-full max-w-lg h-auto mx-auto bg-bgComp shadow-md rounded-xl p-4">
@@ -66,8 +80,8 @@ const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
             id="city"
             value={city}
             onChange={handleInputChange}
-            placeholder={`Введите название города... ${name}`}
-            className="bg-bgElem w-full h-10 rounded-md shadow-sm  sm:text-m text-txElemActive pl-3 focus:outline-none focus:border-bgElemActive focus:ring-2 focus:ring-bgElemActive"
+            placeholder={`Введите название города...`}
+            className="bg-bgElem w-full h-10 rounded-md shadow-sm sm:text-m text-txElemActive pl-3 focus:outline-none focus:border-bgElemActive focus:ring-2 focus:ring-bgElemActive"
           />
           <div className="absolute inset-y-0 right-0 flex items-center space-x-2 pr-2">
             <button
@@ -92,10 +106,10 @@ const WeatherCard: React.FC<weatherType> = ({ name, time, temp, image }) => {
 
       <div className="mt-4 flex justify-center gap-4">
         <div className="flex flex-col items-center pt-2 bg-bgElem rounded-md shadow text-txElem">
-          <img src={image} alt="Weather icon" className="w-55 h-55" />
+          <img src={weatherType.icon} alt="Weather icon" className="w-55 h-55" />
         </div>
-        <div className="flex flex-col items-center pt-8 pl-4 pr-4 bg-bgElem rounded-md shadow text-txElem">
-          <div className="text-4xl font-semibold">{temp}°C</div>
+        <div className="flex flex-col items-center pt-8 pl-4 pr-4 pb-8 bg-bgElem rounded-md shadow text-txElem">
+          <div className="text-4xl font-semibold">{weatherType.temp}°C</div>
         </div>
       </div>
     </div>

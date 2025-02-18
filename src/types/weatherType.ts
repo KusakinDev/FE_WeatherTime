@@ -1,9 +1,9 @@
 "use client";
 
 export interface weatherType {
-    id: number;
+    cod: number;
     name: string;
-    time: number;
+    timezone: number;
     temp: number;
-    image: string;
+    icon: string;
 }
