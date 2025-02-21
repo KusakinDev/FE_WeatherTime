@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+
 import WeatherCard from "@/components/weatherCard";
-import { useRouter } from 'next/router';
 import { useParams } from 'next/navigation'
 import { weatherType } from "@/types/weatherType";
 

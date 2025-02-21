@@ -1,7 +1,6 @@
 "use client"; 
+import Image from 'next/image';
 
-import React, { useState } from "react";
-import Link from "next/link";
 
 const Header: React.FC = () => {
  
@@ -10,7 +9,7 @@ const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6">
         <div className="flex items-center space-x-3">
             <img src="/logo.png" alt="Logo" className="h-8 w-8" />
-            <h1 className="text-xl font-semibold">Alexander's weather-time city</h1>
+            <h1 className="text-xl font-semibold">Alexander&apos;s weather-time city</h1>
         </div>
       </div>
     </header>

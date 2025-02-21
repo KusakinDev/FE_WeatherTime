@@ -6,6 +6,7 @@ import { ErrorType } from "@/types/errorType";
 import axios from "axios";
 import API_URL from "@/config";
 import { FaSearch, FaTrash } from "react-icons/fa";
+import Image from 'next/image';
 
 type WeatherProps = {
   initData: weatherType;
@@ -14,7 +15,7 @@ type WeatherProps = {
 
 
 const WeatherCard: React.FC<WeatherProps> = ({ initData }) => {
-  // Определяем начальное значение city
+
   const initialCity = initData.name !== " " ? initData.name : "";
 
   const [city, setCity] = useState(initialCity);
@@ -32,15 +33,19 @@ const WeatherCard: React.FC<WeatherProps> = ({ initData }) => {
 
     try {
       const response = await axios.get(`${API_URL}/weather?name=${city}`);
-      if (response.status === 200) {
-        setWeather(response.data);
-        console.log(weatherType);
-      } if (response.status === 400) {
-        setErrorMessage(response.data)
-        console.log('Data load error:', errorMessage);
-      }
+      setWeather(response.data); 
     } catch (error) {
-      console.error('Request error:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 400) {
+          const errorMessage = error.response.data.message || 'Unknown error';
+          setErrorMessage(errorMessage);
+          alert(errorMessage);
+        } else {
+          console.error('Unhandled response status:', error.response.status);
+        }
+      } else {
+        console.error('Request error:', error);
+      }
     }
   };
 
@@ -49,10 +54,29 @@ const WeatherCard: React.FC<WeatherProps> = ({ initData }) => {
   };
 
   useEffect(() => {
+    console.log('Данные о погоде:', weatherType);
+  }, [weatherType]);
+  
+  useEffect(() => {
+    console.log('Сообщение об ошибке:', errorMessage);
+    setErrorMessage(errorMessage);
+  }, [errorMessage]);
+
+  useEffect(() => {
     const updateTime = () => {
+
       const now = new Date();
-      const adjustedTime = new Date(now.getTime() + weatherType.timezone * 1000);
-      setCurrentTime(adjustedTime.toLocaleTimeString("en-GB"));
+      const utcHours = now.getUTCHours();
+      const utcMinutes = now.getUTCMinutes();
+      const utcSeconds = now.getUTCSeconds();
+
+
+      const adjustedTime = new Date();
+      adjustedTime.setUTCHours(utcHours + weatherType.timezone);
+      adjustedTime.setUTCMinutes(utcMinutes);
+      adjustedTime.setUTCSeconds(utcSeconds);
+
+      setCurrentTime(adjustedTime.toLocaleTimeString("en-GB", { timeZone: "UTC" }));
     };
 
     updateTime();
@@ -62,11 +86,10 @@ const WeatherCard: React.FC<WeatherProps> = ({ initData }) => {
   }, [weatherType.timezone]);
 
   useEffect(() => {
-    // Если начальное имя города не пустое, выполняем handleSearch
     if (initData.name !== " ") {
       handleSearch();
     }
-  }, [initData.name]); // Запуск эффекта при монтировании и при изменении initData.name
+  }, [initData.name]);
 
   return (
     <div className="w-full max-w-lg h-auto mx-auto bg-bgComp shadow-md rounded-xl p-4">
