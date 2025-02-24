@@ -9,8 +9,8 @@ export default function Home() {
       cod: 0,
       name: " ",
       timezone: 0,
-      temp: 7,
-      icon: " ",
+      temp: 0,
+      icon: "https://openweathermap.org/img/wn/01n@1x.png",
     };
 
   return (
